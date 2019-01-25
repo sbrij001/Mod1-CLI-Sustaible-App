@@ -9,6 +9,21 @@ class Location < ActiveRecord::Base
     self.facts[randNum].fact
     #Location.first.facts[0].fact
   end
+
+
+  # def coolfact
+  #   facts_arr = self.facts
+  #   i = 0
+  #   return_fact = []
+  #   while i < facts_arr.length
+  #      facts_arr.map do |fact_inst|
+  #       return_fact <<  fact_inst.fact
+  #      end
+  #     i += 1
+  #   end
+  #   puts return_fact
+  # end
+
 end
 
 

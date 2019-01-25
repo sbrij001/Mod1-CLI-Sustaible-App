@@ -1,14 +1,13 @@
 class CommandLineInterface
     def create_user
     puts 'Please enter a username to get started.'
-    user_name = gets.chomp
+    user_name = gets.chomp.capitalize
     usernames_arr = User.all.map {|user| user.name}
       if usernames_arr.include?(user_name)
         puts "Sorry, that username is taken."
-        puts "Please enter a different username."
-        user_name = gets.chomp
+        welcome
       end
-    $user = User.create(name: user_name)
+    user = User.create(name: user_name)
     system "clear"
     puts "Trying to educate yourself on how to be more sustainable in your state but not sure how to? We can help you with that!"
     sleep(1)
@@ -19,9 +18,9 @@ class CommandLineInterface
       system "clear"
       if @location == nil
           puts "Sorry, we have no information for that location."
-      elsif join = UserLocation.create( name: $user.name, user_id: $user.id, location_id: @location.id)
+      elsif join = UserLocation.create( name: user.name, user_id: user.id, location_id: @location.id)
         #find_location = Location.find_by(state: user_location)
-          find_location = $user.locations[0]
+          find_location = user.locations[0]
           puts find_location.coolfact
       end
       sleep(2)
@@ -31,22 +30,28 @@ class CommandLineInterface
   def update_user_location
     puts "Want to change your location and find some sustainable facts about that location?"
     puts 'Please enter your username to get started.'
-    user_name = gets.chomp
-    $user = User.create(name: user_name)
-    system "clear"
-    puts "Please enter your new location."
-    new_location = gets.chomp
-    capitalize = new_location.split.map(&:capitalize).join(' ')
-    @new_location = Location.find_by(state: capitalize)
-      if @new_location == nil
-        puts "Sorry, we have no information for that location."
-      elsif join = UserLocation.create(name: $user.name, user_id: $user.id, location_id: @new_location.id)
-      #find_location = Location.find_by(state: user_location)
-        find_location = $user.locations[0]
-        puts find_location.coolfact
-      end
-      sleep(2)
-      welcome
+    user_name = gets.chomp.capitalize
+    user = User.all.find_by(name: user_name)
+      if user == nil
+        puts "Please create a profile"
+        puts "_______________________"
+        sleep(1)
+        welcome
+        system "clear"
+      elsif puts "Please enter your new location."
+        new_location = gets.chomp
+        capitalize = new_location.split.map(&:capitalize).join(' ')
+        i = Location.all.find_by(state: capitalize)
+          if i == nil
+            puts "Sorry, we have no information for that location."
+            welcome
+          end
+        new_location = UserLocation.find(user.id)
+        new_location.update(location_id: i.id)
+        puts new_location.location.coolfact
+          sleep(2)
+          welcome
+        end 
   end
 
   def delete_file
@@ -60,14 +65,21 @@ class CommandLineInterface
     welcome
   end
 
-  def current_facts
-    puts "Want to see your current facts?"
+  def state_facts
+    puts "Want to see all of the current facts for your state?"
     puts "Please enter your username to get started"
-    user_name = gets.chomp
-    user_inst = UserLocation.all.find { |username|  username.name == user_name}
-    binding.pry
-    puts user_inst.location.facts.map {|facts| facts.fact}
-
+    name = gets.chomp.capitalize
+    user_name = name
+    user_inst = UserLocation.all.find { |instance| instance.name == user_name }
+    facts_inst_arr =  user_inst.location.facts
+    facts_inst_arr.map do |facts|
+      puts "                      "
+      puts facts.fact
+      puts "_______________________"
+      puts "                      "
+    end
+    sleep(3)
+    welcome
   end
 
   def goodbye
@@ -88,7 +100,7 @@ class CommandLineInterface
   def welcome
     main_menu = [{"Create A Profile" => -> do create_user end},
     {"Update Your Location" => -> do update_user_location end},
-    {"See Your Current Facts" => -> do current_facts end},
+    {"See All the Facts from Your State" => -> do state_facts end},
     {"Delete Your Profile" => -> do delete_file end},
     {"Exit" => -> do goodbye end}]
     prompt = TTY::Prompt.new
@@ -100,5 +112,4 @@ class CommandLineInterface
     puts 'Welcome to Sustainable, the best resource for Sustainable information in the world!'
     welcome
   end
-
 end

@@ -4,6 +4,7 @@ class User < ActiveRecord::Base
 
 end
 
+
 #method for so the user can access of it facts
 
 #find a fact by date
