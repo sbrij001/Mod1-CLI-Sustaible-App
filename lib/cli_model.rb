@@ -4,7 +4,10 @@ class CommandLineInterface
     user_name = gets.chomp.capitalize
     usernames_arr = User.all.map {|user| user.name}
       if usernames_arr.include?(user_name)
+        puts "                              "
         puts "Sorry, that username is taken."
+        puts "_______________________"
+        sleep(3)
         welcome
       end
     user = User.create(name: user_name)
@@ -37,21 +40,24 @@ class CommandLineInterface
         puts "_______________________"
         sleep(1)
         welcome
-        system "clear"
-      elsif puts "Please enter your new location."
+      else
+        puts "Please enter your new location."
         new_location = gets.chomp
         capitalize = new_location.split.map(&:capitalize).join(' ')
         i = Location.all.find_by(state: capitalize)
           if i == nil
             puts "Sorry, we have no information for that location."
             welcome
+            sleep(1)
           end
-        new_location = UserLocation.find(user.id)
+        new_location = UserLocation.find_by(user_id: user.id)
         new_location.update(location_id: i.id)
+        puts "                             "
         puts new_location.location.coolfact
-          sleep(2)
+        puts "_______________________"
+          sleep(3)
           welcome
-        end 
+      end
   end
 
   def delete_file
